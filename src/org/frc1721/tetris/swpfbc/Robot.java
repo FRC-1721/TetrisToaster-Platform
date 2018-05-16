@@ -7,11 +7,16 @@
 
 package org.frc1721.tetris.swpfbc;
 
+import org.frc1721.tetris.swpfbc.subsystems.Climber;
+import org.frc1721.tetris.swpfbc.subsystems.DriveTrain;
+import org.frc1721.tetris.swpfbc.subsystems.Elevator;
+import org.frc1721.tetris.swpfbc.subsystems.Grabber;
+import org.frc1721.tetris.swpfbc.utils.TidalDrive;
+
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -21,6 +26,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * project.
  */
 public class Robot extends TimedRobot {
+	/* ------- CLASSES -------- */
+	public static DriveTrain drivetrain;
+	public static Climber climber;
+	public static Grabber grabber;
+	public static Elevator elevator;
 	public static OI m_oi;
 
 
@@ -31,6 +41,20 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		m_oi = new OI();
+
+		RobotMap.dtLeft = new TalonSRX(RobotMap.dtLeftP);
+		RobotMap.dtRight = new TalonSRX(RobotMap.dtRightP);
+		
+        RobotMap.dtLeft.config_kF(0, RobotMap.kF, RobotMap.kTimeoutMS);
+        RobotMap.dtLeft.config_kP(0, RobotMap.kP, RobotMap.kTimeoutMS);
+        RobotMap.dtLeft.config_kI(0, RobotMap.kI, RobotMap.kTimeoutMS);
+        RobotMap.dtLeft.config_kD(0, RobotMap.kD, RobotMap.kTimeoutMS);
+        
+        RobotMap.dtRight.config_kF(0, RobotMap.kF, RobotMap.kTimeoutMS);
+        RobotMap.dtRight.config_kP(0, RobotMap.kP, RobotMap.kTimeoutMS);
+        RobotMap.dtRight.config_kI(0, RobotMap.kI, RobotMap.kTimeoutMS);
+        RobotMap.dtRight.config_kD(0, RobotMap.kD, RobotMap.kTimeoutMS);
+        RobotMap.robotDrive = new TidalDrive(RobotMap.dtLeft, RobotMap.dtRight);
 	}
 
 	/**
@@ -73,6 +97,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
+		
 	}
 
 	/**
@@ -80,6 +105,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
+		DriveTrain.driveWithJoystick(RobotMap.stick, RobotMap.robotDrive);
 		Scheduler.getInstance().run();
 	}
 

@@ -7,10 +7,13 @@
 
 package org.frc1721.tetris.swpfbc;
 
+import org.frc1721.tetris.swpfbc.utils.TidalDrive;
+
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Joystick;
 
 /**
  * The RobotMap is a mapping from the ports sensors and actuators are wired into
@@ -23,6 +26,9 @@ public class RobotMap {
 	/* Motors */
 	public static TalonSRX dtLeft, dtRight, elevator;	
 	public static VictorSPX intakeM, intakeS, climbM, climbS;
+	
+	/* Drive Object */
+	public static TidalDrive robotDrive;
 	
 	/* Motor Ports */
 	public static final int dtLeftP 	=	0,
@@ -37,6 +43,18 @@ public class RobotMap {
 	public static DoubleSolenoid solenoid;
 	public static final int inChannel = 0, outChannel = 1;
 	
+	
 	/* Encoders & Switches */
+	public static double kP = 0.001, kI = 0.0, kD = 0.0, kF = 0.0;
+	public static final double kSensorUnitsPerRotation = 4096;
+	public static int kTimeoutMS = 10;
+	public static double kInchesPerTick = .00460205078;
+	
+	public static double kTenFeet = 26075.9458762; // Ticks in ten feet.
+	
+	/* Joysticks, Controllers, Etc */
+	public static Joystick stick;
+	public static Joystick controller;
+	
 	
 }
