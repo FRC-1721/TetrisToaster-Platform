@@ -15,16 +15,14 @@ public class IntakeStop extends Command {
 
 	
 	private static Grabber intake;
-	private static RobotMap rm;
 	
 	public IntakeStop() {
-		requires(intake);
 	}
 	
 	protected void initialize() {}
 	
 	protected void execute() {
-		intake.stopIntakeMotors(rm.intakeM);
+		Grabber.stopIntakeMotors(RobotMap.intakeM);
 	}
 	
 	protected boolean isFinished() 	{	return false;	}

@@ -16,24 +16,21 @@ public class Climber extends Subsystem {
     // here. Call these from Commands.
 
     public void initDefaultCommand() {
-        // Set the default command for a subsystem here.
-        //setDefaultCommand(new MySpecialCommand());
-    	setDefaultCommand(new ClimberStop());
     }
     
     /**
      * Climb up to the bar until stopped.
      * @param climber
      */
-    public void climb(VictorSPX climber) {
-    	climber.set(ControlMode.PercentOutput, 1);
+    public static void climb(VictorSPX climber) {
+    	climber.set(ControlMode.PercentOutput, -1);
     }
     
     /**
      * Stops the climber.
      * @param climber
      */
-    public void stopClimb(VictorSPX climber) {
+    public static void stopClimb(VictorSPX climber) {
     	climber.set(ControlMode.PercentOutput, 0);
     }
 }

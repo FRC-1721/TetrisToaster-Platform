@@ -1,10 +1,16 @@
 package org.frc1721.tetris.swpfbc.subsystems;
 
+import java.util.concurrent.TimeUnit;
+
+import org.frc1721.tetris.swpfbc.ControlsMap;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
@@ -31,8 +37,8 @@ public class Grabber extends Subsystem {
 	 * @param master The master motor controller - when this runs,
 	 * the other side will follow as it's the slave.
 	 */
-	public static void cubeIn(VictorSPX master) {
-		master.set(ControlMode.PercentOutput, 1);
+	public static void cubeIn(Joystick j, VictorSPX master) {
+		master.set(ControlMode.PercentOutput, j.getRawAxis(ControlsMap.spinAxis));
 	}
 	
 	/**
@@ -40,8 +46,8 @@ public class Grabber extends Subsystem {
 	 * @param master The master motor controller - when this runs,
 	 * the other side will follow as it's the slave.
 	 */
-	public static void cubeOut(VictorSPX master) {
-		master.set(ControlMode.PercentOutput, -1);
+	public static void cubeOut(Joystick j, VictorSPX master) {
+		master.set(ControlMode.PercentOutput, -j.getRawAxis(ControlsMap.spinAxis));
 	}
 	
 	/**
@@ -60,6 +66,10 @@ public class Grabber extends Subsystem {
 		solenoid.set(DoubleSolenoid.Value.kReverse);
 	}
 	
+	public static void moveArms(Joystick j, VictorSPX mot) {
+		mot.set(ControlMode.PercentOutput, j.getRawAxis(ControlsMap.grabberAxis));
+	}
+	
 	/**
 	 * First step in the cube collection process.
 	 * <ol>
@@ -76,19 +86,31 @@ public class Grabber extends Subsystem {
 	 * 
 	 * @param limit A limit switch to detect if the robot has a cube.
 	 */
-	public static void harvestCube(VictorSPX master, DoubleSolenoid solenoid, DigitalInput limit) {
+//	@Deprecated
+	/*public static void harvestCube(VictorSPX master, DoubleSolenoid solenoid, DigitalInput limit) {
 		armsOpen(solenoid);
 		cubeIn(master);
-		while(!hasCube(limit)) {} /* Black magic */
+		while(!hasCube(limit)) {}
 		armsClose(solenoid);
 		stopIntakeMotors(master);
-	}
+	}*/
 	
 	/**
 	 * Determine if the robot has a cube in the intake.
 	 * @param limit A limit switch to check if the robot has a cube.
 	 */
+	@Deprecated
 	public static boolean hasCube(DigitalInput limit) {
 		return limit.get();
+	}
+	
+	public static boolean ejectCube(VictorSPX intakeM) {
+		intakeM.set(ControlMode.PercentOutput, -1);
+		try {
+			TimeUnit.MILLISECONDS.sleep(3000);
+		} catch (Exception e) {
+		}
+		intakeM.set(ControlMode.PercentOutput, 0);
+		return true;
 	}
 }

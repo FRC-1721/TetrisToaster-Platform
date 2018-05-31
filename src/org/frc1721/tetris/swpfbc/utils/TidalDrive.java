@@ -107,7 +107,7 @@ public class TidalDrive extends RobotDriveBase {
     }
 
     m_leftMotor.set(ControlMode.PercentOutput, limit(leftMotorOutput) * m_maxOutput);
-    m_rightMotor.set(ControlMode.PercentOutput, -limit(rightMotorOutput) * m_maxOutput);
+    m_rightMotor.set(ControlMode.PercentOutput, limit(rightMotorOutput) * m_maxOutput);
 
     m_safetyHelper.feed();
   }

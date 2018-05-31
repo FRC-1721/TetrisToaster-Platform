@@ -25,7 +25,7 @@ public class RobotMap {
 	
 	/* Motors */
 	public static TalonSRX dtLeft, dtRight, elevator;	
-	public static VictorSPX intakeM, intakeS, climbM, climbS;
+	public static VictorSPX intakeM, intakeS, climbM, climbS, grabberS;
 	
 	/* Drive Object */
 	public static TidalDrive robotDrive;
@@ -33,11 +33,12 @@ public class RobotMap {
 	/* Motor Ports */
 	public static final int dtLeftP 	=	0,
 							dtRightP 	=	1,
-							intakeMP 	= 	2,
+							intakeMP 	= 	4,
 							intakeSP	=	3,
-							elevatorP	=	4,
-							climbMP		=	5,
-							climbSP		=	6;
+							elevatorP	=	2,
+							climbMP		=	0,
+							climbSP		=	5,
+							armLiftP 	=	2;
 	
 	/* Pneumatics */
 	public static DoubleSolenoid solenoid;
@@ -45,7 +46,7 @@ public class RobotMap {
 	
 	
 	/* Encoders & Switches */
-	public static double kP = 0.001, kI = 0.0, kD = 0.0, kF = 0.0;
+	public static double kP = 0.1, kI = 0.000015, kD = 0.1, kF = .1;
 	public static final double kSensorUnitsPerRotation = 4096;
 	public static int kTimeoutMS = 10;
 	public static double kInchesPerTick = .00460205078;

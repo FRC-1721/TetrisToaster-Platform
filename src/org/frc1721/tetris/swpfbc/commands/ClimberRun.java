@@ -15,20 +15,22 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class ClimberRun extends Command {
 
-	private static Climber climber;
 	private static RobotMap rm;
 	
 	public ClimberRun() {
-		requires(climber);
 	}
 	
-	protected void initialize() {}
+	protected void initialize() {
+		Climber.climb(rm.climbM);
+	}
 	
 	protected void execute() {
-		climber.climb(rm.climbM);
+		
 	}
 	
-	protected boolean isFinished() {	return false;	}
+	protected boolean isFinished() {	return true;	}
 	protected void end() {}
-	protected void interrupted() {}
+	protected void interrupted() {
+		Climber.stopClimb(rm.climbM);
+	}
 }

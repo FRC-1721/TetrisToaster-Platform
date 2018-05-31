@@ -7,7 +7,10 @@
 
 package org.frc1721.tetris.swpfbc;
 
+import org.frc1721.tetris.swpfbc.commands.ClimberRun;
 import org.frc1721.tetris.swpfbc.commands.ClimberStop;
+import org.frc1721.tetris.swpfbc.commands.CloseGrabber;
+import org.frc1721.tetris.swpfbc.commands.OpenGrabber;
 
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
@@ -25,7 +28,8 @@ public class OI {
 	public OI() {
 		closeButton.whileHeld(new CloseGrabber());
 		openButton.whileHeld(new OpenGrabber());
-		climbButton.whileHeld(new Climb());
+		climbButton.whileHeld(new ClimberRun());
 		climbButton.whenReleased(new ClimberStop());
+		
 	}
 }

@@ -7,16 +7,28 @@
 
 package org.frc1721.tetris.swpfbc;
 
+import java.util.concurrent.TimeUnit;
+
+import org.frc1721.tetris.swpfbc.commands.Baseline;
+import org.frc1721.tetris.swpfbc.commands.SwitchLeft;
+import org.frc1721.tetris.swpfbc.commands.SwitchRight;
 import org.frc1721.tetris.swpfbc.subsystems.Climber;
 import org.frc1721.tetris.swpfbc.subsystems.DriveTrain;
 import org.frc1721.tetris.swpfbc.subsystems.Elevator;
 import org.frc1721.tetris.swpfbc.subsystems.Grabber;
+import org.frc1721.tetris.swpfbc.utils.EncoderConversion;
+import org.frc1721.tetris.swpfbc.utils.InitMotors;
+import org.frc1721.tetris.swpfbc.utils.TalonConfigs;
 import org.frc1721.tetris.swpfbc.utils.TidalDrive;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -32,6 +44,10 @@ public class Robot extends TimedRobot {
 	public static Grabber grabber;
 	public static Elevator elevator;
 	public static OI m_oi;
+	public static SendableChooser autoChooser;
+	Command autoCommand;
+	boolean isRunning = false;
+	int counter = 0;
 
 
 	/**
@@ -40,21 +56,19 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		m_oi = new OI();
-
-		RobotMap.dtLeft = new TalonSRX(RobotMap.dtLeftP);
-		RobotMap.dtRight = new TalonSRX(RobotMap.dtRightP);
-		
-        RobotMap.dtLeft.config_kF(0, RobotMap.kF, RobotMap.kTimeoutMS);
-        RobotMap.dtLeft.config_kP(0, RobotMap.kP, RobotMap.kTimeoutMS);
-        RobotMap.dtLeft.config_kI(0, RobotMap.kI, RobotMap.kTimeoutMS);
-        RobotMap.dtLeft.config_kD(0, RobotMap.kD, RobotMap.kTimeoutMS);
-        
-        RobotMap.dtRight.config_kF(0, RobotMap.kF, RobotMap.kTimeoutMS);
-        RobotMap.dtRight.config_kP(0, RobotMap.kP, RobotMap.kTimeoutMS);
-        RobotMap.dtRight.config_kI(0, RobotMap.kI, RobotMap.kTimeoutMS);
-        RobotMap.dtRight.config_kD(0, RobotMap.kD, RobotMap.kTimeoutMS);
+		/* Talon configs */
+		InitMotors.initializeMotors();
+		TalonConfigs.configTalons();
+        RobotMap.stick = new Joystick(ControlsMap.joyPort);
+        RobotMap.controller = new Joystick(ControlsMap.controllerPort);
         RobotMap.robotDrive = new TidalDrive(RobotMap.dtLeft, RobotMap.dtRight);
+        m_oi = new OI();
+        
+        autoChooser = new SendableChooser();
+        autoChooser.addDefault("Switch right", new SwitchRight());
+        autoChooser.addObject("Switch left", new SwitchLeft());
+        autoChooser.addObject("Baseline", new Baseline());
+        SmartDashboard.putData("Auto chooser", autoChooser);
 	}
 
 	/**
@@ -85,6 +99,10 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+		counter = 0;
+        RobotMap.dtRight.setSelectedSensorPosition(0, 0, RobotMap.kTimeoutMS);
+        RobotMap.dtLeft.setSelectedSensorPosition(0, 0, RobotMap.kTimeoutMS);
+        autoCommand = (Command) autoChooser.getSelected();
 	}
 
 	/**
@@ -93,6 +111,26 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousPeriodic() {
 		Scheduler.getInstance().run();
+		double targetPos = EncoderConversion.getVal(8); //Distance in feet
+		
+		RobotMap.dtLeft.clearStickyFaults(RobotMap.kTimeoutMS);
+		RobotMap.dtRight.clearStickyFaults(RobotMap.kTimeoutMS);
+		
+		RobotMap.dtLeft.set(ControlMode.Position, targetPos);
+		RobotMap.dtRight.set(ControlMode.Position, targetPos);
+		
+		SmartDashboard.putNumber("Left Error", (double) RobotMap.dtLeft.getClosedLoopError(0));
+		SmartDashboard.putNumber("Right Error", (double) RobotMap.dtRight.getClosedLoopError(0));
+		
+		try {
+			TimeUnit.MILLISECONDS.sleep(10);
+			counter += 10;
+		} catch (Exception e) { /* Black Magic */ }
+		
+		if ((counter >= 3000) && (isRunning == false)) {
+			isRunning = true;
+			autoCommand.start();
+		}
 	}
 
 	@Override
@@ -105,8 +143,15 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		DriveTrain.driveWithJoystick(RobotMap.stick, RobotMap.robotDrive);
 		Scheduler.getInstance().run();
+		DriveTrain.driveWithJoystick(RobotMap.stick, RobotMap.robotDrive);
+		Elevator.moveUp(RobotMap.controller, RobotMap.elevator);
+		if(RobotMap.controller.getRawAxis(ControlsMap.lowerLiftAxis) >= .2) {
+			Elevator.moveDown(RobotMap.controller, RobotMap.elevator);
+		}
+		Grabber.moveArms(RobotMap.controller, RobotMap.grabberS);
+		Grabber.cubeIn(RobotMap.controller, RobotMap.intakeM);
+		Grabber.cubeOut(RobotMap.controller, RobotMap.intakeM);
 	}
 
 	/**

@@ -20,6 +20,7 @@ public class ControlsMap {
 	
 	public static final int raiseLiftAxis = 3,
 							lowerLiftAxis = 2,
+							grabberAxis = 1,
 							spinAxis = 5;
 	
 	

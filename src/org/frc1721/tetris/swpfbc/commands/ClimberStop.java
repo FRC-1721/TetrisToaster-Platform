@@ -14,19 +14,19 @@ import edu.wpi.first.wpilibj.command.Command;
 public class ClimberStop extends Command {
 	
 	private static Climber climber;
-	private static RobotMap rm;
 	
     public ClimberStop() {
-    	requires(climber);
     }
 
-    protected void initialize() {}
+    protected void initialize() {
+    	climber.stopClimb(RobotMap.climbM);
+    }
 
     protected void execute() {
-    	climber.stopClimb(rm.climbM);
+    	
     }
 
-    protected boolean isFinished() 	{	return false;	}
+    protected boolean isFinished() 	{	return true;	}
     protected void end() 			{					}
-    protected void interrupted() 	{					}
+    protected void interrupted() 	{	climber.stopClimb(RobotMap.climbM);}
 }
